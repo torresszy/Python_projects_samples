@@ -1,5 +1,5 @@
 """
-CS121: Schelling Model of Housing Segregation
+Schelling Model of Housing Segregation
 
   Program for simulating a variant of Schelling's model of
   housing segregation.  This program takes six parameters:
@@ -41,23 +41,6 @@ def similarity_score(grid, location, R):
         location (int, int): a grid location
     Returns: float
     """
-    x, y = location
-    S = 0
-    H = 0
-    
-    for i in range(x-R, x+1+R):
-        if len(grid[0])-1 >= i >= 0:
-            for j in range(y-R, y+1+R):
-                if len(grid)-1 >= j >= 0:
-                    if abs(x - i) + abs(y - j) in range(0, R+1) and grid[i][j] != "F":
-                        H += 1
-                        if grid[i][j] == grid[x][y]:
-                            S += 1
-                
-    result = S / H
-
-    return result
-    
 
 
 def is_satisfied(grid, R, location, sim_sat_range):
@@ -76,16 +59,6 @@ def is_satisfied(grid, R, location, sim_sat_range):
           with his similarity score.
     Returns: bool
     '''
-    x, y = location
-
-    assert grid[x][y] != "F"
-
-    satisfied = False
-
-    if sim_sat_range[0] <= similarity_score(grid, location, R) <= sim_sat_range[1]:
-        satisfied = True
-        
-    return satisfied
 
 
 def relocating_one_home(grid, location, R, sim_sat_range, patience, homes_for_sale):
@@ -105,38 +78,7 @@ def relocating_one_home(grid, location, R, sim_sat_range, patience, homes_for_sa
 
     Returns: (bool) whether the attempt of relocation is successful 
     '''
-    x, y = location
 
-    if grid[x][y] == "M":
-        original = "M"
-    elif grid[x][y] == "B":
-        original = "B"
-
-    succ_reloc = False
-
-    if is_satisfied(grid, R, location, sim_sat_range) == False:
-        for candidate in homes_for_sale:
-            i, j = candidate
-            grid[i][j] = grid[x][y]
-            grid[x][y] = "F"
-            # swapping the value of the elements in the home_for_sale temporarily
-            if is_satisfied(grid, R, candidate, sim_sat_range) == True:
-                if patience > 1:
-                    patience -= 1
-                    grid[i][j] = "F"
-                    grid[x][y] = original
-                    # changing the value of the for_sale list back
-                elif patience == 1:
-                    homes_for_sale.remove(candidate)
-                    homes_for_sale.insert(0, location)
-                    succ_reloc = True
-                    break
-            else:
-                grid[i][j] = "F"
-                grid[x][y] = original
-                # changing the value of the for_sale list back   
-
-    return succ_reloc
 
 def simulating_one_wave(grid, R, sim_sat_range, patience, wave, homes_for_sale):
     '''
@@ -156,16 +98,6 @@ def simulating_one_wave(grid, R, sim_sat_range, patience, wave, homes_for_sale):
     Returns: (int) number of relocations done in this wave 
     '''
 
-    reloc_in_a_wave = 0
-
-    for x, row in enumerate(grid):
-        for y, location in enumerate(row):
-            if location == wave:
-                if relocating_one_home(grid, (x, y), R, sim_sat_range, patience, homes_for_sale) == True:
-                    reloc_in_a_wave += 1
-
-    return reloc_in_a_wave
-
 
 def simulating_one_step(grid, R, sim_sat_range, patience, homes_for_sale):
     '''
@@ -184,13 +116,6 @@ def simulating_one_step(grid, R, sim_sat_range, patience, homes_for_sale):
     Returns: (int) number of relocations done in this step 
     '''
 
-    step = ["M", "B"]
-    reloc_in_a_step = 0
-
-    for wave in step:
-        reloc_in_a_step += simulating_one_wave(grid, R, sim_sat_range, patience, wave, homes_for_sale)
-
-    return reloc_in_a_step
 
 def do_simulation(grid, R, sim_sat_range, patience, max_steps, homes_for_sale):
     '''
@@ -209,19 +134,6 @@ def do_simulation(grid, R, sim_sat_range, patience, max_steps, homes_for_sale):
 
     Returns: (int) The number of relocations completed.
     '''
-
-    finished_steps = 0
-    total_reloc = 0
-    current_reloc = 0
-
-    while max_steps > finished_steps:
-        current_reloc = total_reloc
-        total_reloc += simulating_one_step(grid, R, sim_sat_range, patience, homes_for_sale)
-        finished_steps += 1
-        if total_reloc == current_reloc:
-            break
-
-    return total_reloc
 
 
 @click.command(name="schelling")

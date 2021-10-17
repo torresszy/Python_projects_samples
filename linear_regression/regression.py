@@ -1,8 +1,6 @@
 '''
 Linear regression
 
-YOUR NAME HERE
-
 Main file for linear regression and model selection.
 '''
 
@@ -75,8 +73,6 @@ class Model(object):
         Compute the beta value based on the training set
         """
 
-        return util.linear_regression(self.training_pred_vars, self.training_dep_vars)
-
     def compute_R2(self, testing=False):
         """
         Compute the R2 value for the training or
@@ -86,17 +82,6 @@ class Model(object):
             testing (boolean): whether to use the
               training or testing set to compute the value
         """
-
-        if testing:
-            y = self.testing_dep_vars
-            X = self.testing_pred_vars
-        else:
-            y = self.training_dep_vars
-            X = self.training_pred_vars
-
-        y_mean = y.mean()
-        y_pred = util.apply_beta(self.beta, X)
-        return 1 - sum((y - y_pred) **2) / sum((y - y_mean) **2)
 
 
 def compute_single_var_models(dataset):
@@ -110,13 +95,6 @@ def compute_single_var_models(dataset):
         List of Model objects, each representing a single-variable model
     '''
 
-    models = []
-
-    for predictor in dataset.pred_vars:
-        models.append(Model(dataset, [predictor]))
-
-    return models
-
 
 def compute_all_vars_model(dataset):
     '''
@@ -129,8 +107,6 @@ def compute_all_vars_model(dataset):
         A Model object that uses all the predictor variables
     '''
 
-    return Model(dataset, dataset.pred_vars)
-
 
 def compute_best_pair(dataset):
     '''
@@ -142,18 +118,6 @@ def compute_best_pair(dataset):
     Returns:
         A Model object for the best bivariate model
     '''
-    best_pair = None
-
-    for i, predictor in enumerate(dataset.pred_vars):
-        for y in range(i+1, len(dataset.pred_vars)):
-            pair = [predictor, dataset.pred_vars[y]]
-            model = Model(dataset, pair)
-            if best_pair is None:
-                best_pair = model                
-            elif model.R2 > best_pair.R2:
-                best_pair = model
-
-    return best_pair
 
 
 def forward_selection(dataset):
@@ -169,30 +133,6 @@ def forward_selection(dataset):
         model where K=1, the second element is the model where K=2, and so on.
     '''
 
-    rv = []
-    predictor_vars = []
-
-    for K in range(len(dataset.pred_vars)):
-        best_set = None
-
-        for predictor in dataset.pred_vars:
-            if predictor not in predictor_vars:
-                predictor_vars.append(predictor)
-                model = Model(dataset, predictor_vars.copy())
-                if best_set is None:
-                    best_set = model
-                elif model.R2 > best_set.R2:
-                    best_set = model
-            else:
-                continue
-
-            predictor_vars.pop()
-
-        predictor_vars = best_set.pred_vars
-        rv.append(best_set)
-
-    return rv
-
 
 def validate_model(dataset, model):
     '''
@@ -207,5 +147,3 @@ def validate_model(dataset, model):
     Returns:
         (float) An R2 value
     '''
-
-    return model.testing_R2

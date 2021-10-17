@@ -28,15 +28,6 @@ def compute_internal_values(t):
         t.value)
     '''
 
-    if t.num_children() != 0:
-        total_value = 0
-        for st in t.children:
-            total_value += compute_internal_values(st)
-        t.value = total_value
-
-    return t.value
-
-
 def compute_paths(t, prefix=()):
     '''
     Assign the path attribute of all nodes to be the full path through the
@@ -56,14 +47,6 @@ def compute_paths(t, prefix=()):
         Nothing. The input tree t should be modified to contain a path
             attribute for all nodes.
     '''
-
-    t.path = prefix
-
-    if t.num_children() != 0:
-        prefix += (t.key,) # https://stackoverflow.com/questions/4913397/how-to-add-value-to-a-tuple
-        for st in t.children:
-            compute_paths(st, prefix)
-
 
 class Rectangle:
     '''
@@ -105,14 +88,6 @@ def tree_list(t):
         A list of tree objects
     '''
 
-    rv = []
-
-    for st in t.children:
-        rv.append(st)
-
-    return sorted_trees(rv)
-
-
 def place_one_row(tree_lst, bounding_rec, total_sum):
     '''
     place one row of rectangle(s) given the bounding rectangle
@@ -133,55 +108,6 @@ def place_one_row(tree_lst, bounding_rec, total_sum):
           of placement
     '''
 
-    rec_lst = []
-    k = 1
-
-    while k <= len(tree_lst):
-        aspect_ratio = 0
-        row_layout = compute_row(bounding_rec, tree_lst[:k], total_sum)[0]
-        for pair in row_layout:
-            rec = pair[0]
-            current_asp_ratio = max(rec.width, rec.height)\
-                / min(rec.width, rec.height)
-            if current_asp_ratio > aspect_ratio:
-                aspect_ratio = current_asp_ratio
-
-        if k == 1:
-            if len(tree_lst) == 1:
-                row_layout, leftover = \
-                    compute_row(bounding_rec, tree_lst, total_sum)
-                new_total_sum = 0
-                for pair in row_layout:
-                    rec, t = pair
-                    rec.label = t.key
-                    rec.color_code = t.path
-                    rec_lst.append(rec)
-                new_bounding_rec = leftover
-                new_tree_lst = []
-                break
-            else:
-                prev_asp_ratio = aspect_ratio
-                k += 1
-        elif aspect_ratio < prev_asp_ratio and k < len(tree_lst):
-            prev_asp_ratio = aspect_ratio
-            k += 1
-        else:
-            row_layout, leftover = \
-                compute_row(bounding_rec, tree_lst[:k-1], total_sum)
-            new_total_sum = total_sum
-            for pair in row_layout:
-                rec, t = pair
-                rec.label = t.key
-                rec.color_code = t.path
-                rec_lst.append(rec)
-                new_total_sum -= t.value
-            new_bounding_rec = leftover
-            new_tree_lst = tree_lst[k-1:]
-            break
-
-    return rec_lst, new_bounding_rec, new_tree_lst, new_total_sum
-
-
 def place_all_rows(tree_lst, bounding_rec, total_sum):
     '''
     place all the rectangles given a list of trees that are leaves
@@ -193,16 +119,6 @@ def place_all_rows(tree_lst, bounding_rec, total_sum):
 
     Returns: (list) a list of rectangles
     '''
-
-    rec_lst, new_bounding_rec, new_tree_lst, new_total_sum\
-        = place_one_row(tree_lst, bounding_rec, total_sum)
-
-    if new_total_sum == 0:
-        return rec_lst
-    else:
-        rv = rec_lst + \
-            place_all_rows(new_tree_lst, new_bounding_rec, new_total_sum)
-        return rv
 
 
 def place_multilayer_rectangles(t, bounding_rec):
@@ -217,21 +133,6 @@ def place_multilayer_rectangles(t, bounding_rec):
     Returns: (list) a list of all the rectangles from a tree
     '''
 
-    tree_lst = tree_list(t)
-    total_sum = t.value
-    rectangles = place_all_rows(tree_lst, bounding_rec, total_sum)
-    rv = []
-
-    for i, st in enumerate(tree_lst):
-        if st.num_children() == 0:
-            rv.append(rectangles[i])
-        else:
-            sub_bounding_rec = rectangles[i]
-            sub_rectangles = place_multilayer_rectangles(st, sub_bounding_rec)
-            rv += sub_rectangles
-
-    return rv
-
 
 def compute_rectangles(t, bounding_rec_width=1.0, bounding_rec_height=1.0):
     '''
@@ -245,17 +146,10 @@ def compute_rectangles(t, bounding_rec_width=1.0, bounding_rec_height=1.0):
     Returns: a list of Rectangle objects.
     '''
 
-    compute_internal_values(t)
-    compute_paths(t)
-    bounding_rec = \
-        Rectangle((0.0, 0.0), (bounding_rec_width, bounding_rec_height))
-
-    return place_multilayer_rectangles(t, bounding_rec)
-
 
 #############################
 #                           #
-#  Our code: DO NOT MODIFY  #
+#                           #
 #                           #
 #############################
 
