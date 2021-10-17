@@ -1,7 +1,7 @@
-CS 121: Polling places
+Polling places
 
-simulate.py: skeleton code for the simulator.  You will modify this
-  file.
+simulate.py: Main Python file
+  - For privacy reason, only function headers are included
 
 util.py: a few utility functions
 
