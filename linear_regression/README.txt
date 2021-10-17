@@ -1,6 +1,7 @@
-# CS121 Linear regression assignment
+Linear regression Program
 
-regression.py: Python file where you will write your code.
+regression.py: Main Python file.
+  - For privacy reason, only function headers are included
 
 util.py: Python file with several helper functions, some of which
          you will need to use in your code.
