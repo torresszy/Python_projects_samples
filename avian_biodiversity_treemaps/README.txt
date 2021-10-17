@@ -1,9 +1,10 @@
-CS 121 Programming Assignment #6: Avian Biodiversity Treemaps
+Avian Biodiversity Treemaps
 ------------------------------------------------------------
 
-These are the files for Programming Assignment #6.
+Files included
 
-- treemap.py: Python file where you will write your code.
+- treemap.py: Main Python file 
+  - For privacy reason, only function headers are included
 
 - tree.py: Python file that provides a Tree class.
 
