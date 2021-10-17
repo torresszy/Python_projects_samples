@@ -1,6 +1,7 @@
-CS121: Schelling Model of Housing Segregation
+Schelling Model of Housing Segregation
 
-schelling.py: skeleton code.  Your code goes in this file.
+schelling.py: main file
+ - For privacy reason, only function headers are included
 
 utility.py: utility functions for dealing with grids.
 
