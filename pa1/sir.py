@@ -23,13 +23,6 @@ def count_infected(city):
     Returns (int): count of the number of people who are
       currently infected
     '''
-    num_infected = 0
-    for x in city:
-      if x[0] == "I":
-        num_infected += 1
-
-    return num_infected
-
 
 def has_an_infected_neighbor(city, position):
     '''
@@ -46,24 +39,6 @@ def has_an_infected_neighbor(city, position):
 
     # This function should only be called when the person at position
     # is susceptible to infection.
-    assert city[position] == "S"
-    infected_neighbor = False
-    
-    if len(city) > 1:
-      if position == 0:
-        if city[position + 1][0] == "I":
-          infected_neighbor = True
-      elif position == len(city) - 1:
-        if city[position - 1][0] == "I":
-          infected_neighbor = True
-      else:
-        if city[position + 1][0] == "I" or city[position - 1 ][0] == "I":
-          infected_neighbor = True
-    elif len(city) == 1:
-      pass
-    
-    return infected_neighbor
-
 
 def advance_person_at_position(city, position, days_contagious):
     '''
@@ -77,25 +52,6 @@ def advance_person_at_position(city, position, days_contagious):
 
     Returns: (string) disease state of the person after one day
     '''
-    next_stage = ""
-
-    if city[position] == "S":
-      if has_an_infected_neighbor(city, position) == True:
-        next_stage = "I0"
-      else:
-        next_stage = "S"
-    elif city[position][0] == "I":
-      if int(city[position][1:]) + 1 < days_contagious:
-        next_stage = "I" + str(int(city[position][1:]) + 1)
-      elif int(city[position][1:]) + 1 >= days_contagious:
-        next_stage = "R"
-    elif city[position] == "R":
-      next_stage = "R"
-    elif city[position] == "V":
-      next_stage = "V"
-
-    return next_stage
-
 
 def simulate_one_day(starting_city, days_contagious):
     '''
@@ -109,16 +65,6 @@ def simulate_one_day(starting_city, days_contagious):
     Returns:
       new_city (list): disease state of the city after one day
     '''
-
-    new_city_state = []
-    new_individual_state = ""
-
-    for i, p in enumerate(starting_city):
-      new_individual_state = advance_person_at_position(starting_city, i, days_contagious)
-      new_city_state.append(new_individual_state)
-
-    return new_city_state
-
 
 def run_simulation(starting_city, days_contagious,
                    random_seed=None, vaccine_effectiveness=0.0):
@@ -136,21 +82,7 @@ def run_simulation(starting_city, days_contagious,
     Returns tuple (list of strings, int): the final state of the city
       and the number of days actually simulated.
     '''
-    random.seed(random_seed)
-
-    day_count = 0
-
-    vac_state = vaccinate_city(starting_city, vaccine_effectiveness)
-    final_state = vac_state.copy()
-
-    # any() operator from https://stackoverflow.com/questions/16380326/check-if-substring-is-in-a-list-of-strings/16380569
-    while any("I" in i for i in final_state):
-      final_state = simulate_one_day(final_state, days_contagious)
-      day_count += 1
-
-    return (final_state, day_count)
-
-
+ 
 def vaccinate_city(starting_city, vaccine_effectiveness):
     '''
     Vaccinate everyone in a city
@@ -164,17 +96,6 @@ def vaccinate_city(starting_city, vaccine_effectiveness):
     Returns:
       new_city (list): state of the city after vaccinating everyone in the city
     '''
-
-    new_city = []
-
-    for i, state in enumerate(starting_city):
-      if state == "S":
-        if random.random() < vaccine_effectiveness:
-          state = "V"
-      new_city.append(state)
-
-    return new_city
-
 
 def calc_avg_days_to_zero_infections(
         starting_city, days_contagious,
@@ -199,22 +120,8 @@ def calc_avg_days_to_zero_infections(
     Returns (float): the average number of days for a city to reach zero
       infections
     '''
-    assert num_trials > 0
 
-    actual_trial = 0
-    num_days = 0
-
-    while actual_trial < num_trials:
-      num_days += run_simulation(starting_city, days_contagious, random_seed, vaccine_effectiveness)[1]
-      actual_trial += 1
-      random_seed += 1
-
-    avg_num_days = num_days / num_trials
-
-    return avg_num_days
-
-
-################ Do not change the code below this line #######################
+###########################################################################
 
 
 @click.command()
